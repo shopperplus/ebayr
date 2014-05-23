@@ -80,11 +80,26 @@ module Ebayr #:nodoc:
     #     Ebayr.xml(:foo=>"Bar")  # => <foo>Bar</foo>
     #     Ebayr.xml(:foo=>["Bar","Baz"])  # => <foo>Bar</foo>
     def self.xml(*args)
+      xml_properties = ''
       args.map do |structure|
         case structure
-          when Hash then structure.map { |k, v| "<#{k.to_s}>#{xml(v)}</#{k.to_s}>" }.join
-          when Array then structure.map { |v| xml(v) }.join
-          else structure.to_s
+          when Hash then
+            structure.map do |k, v|
+              if v.is_a? Hash
+                properties = v.select { |value_k, value_v| value_k.to_s.start_with?('_') }
+                if properties.present?
+                  v = v[:value]
+                  xml_properties = properties.map { |property_key, property_value| "#{k.sub(/_/, '')}='#{property_value}'"}
+                                             .join(' ')
+                end
+              end
+
+              "<#{k.to_s} #{xml_properties}>#{xml(v)}</#{k.to_s}>"
+            end.join
+          when Array then
+            structure.map { |v| xml(v) }.join
+          else
+            structure.to_s
         end
       end.join
     end
