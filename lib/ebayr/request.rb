@@ -89,7 +89,7 @@ module Ebayr #:nodoc:
                 properties = v.select { |value_k, value_v| value_k.to_s.start_with?('_') }
                 if properties.present?
                   v = v[:value]
-                  xml_properties = properties.map { |property_key, property_value| "#{k.sub(/_/, '')}='#{property_value}'"}
+                  xml_properties = properties.map { |property_key, property_value| "#{k.to_s.sub(/_/, '')}='#{property_value}'"}
                                              .join(' ')
                 end
               end
