@@ -81,10 +81,10 @@ module Ebayr #:nodoc:
     #     Ebayr.xml(:foo=>["Bar","Baz"])  # => <foo>Bar</foo>
     def self.xml(*args)
       args.map do |structure|
-        xml_properties = ''
         case structure
           when Hash then
             structure.map do |k, v|
+              xml_properties = ''
               if v.is_a? Hash
                 properties = v.select { |value_k, value_v| value_k.to_s.start_with?('_') }
                 if properties.present?
