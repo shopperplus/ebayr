@@ -94,7 +94,11 @@ module Ebayr #:nodoc:
                 end
               end
 
-              "<#{k.to_s} #{xml_properties}>#{xml(v)}</#{k.to_s}>"
+              if xml_properties.present?
+                "<#{k.to_s} #{xml_properties}>#{xml(v)}</#{k.to_s}>"
+              else
+                "<#{k.to_s}>#{xml(v)}</#{k.to_s}>"
+              end
             end.join
           when Array then
             structure.map { |v| xml(v) }.join
