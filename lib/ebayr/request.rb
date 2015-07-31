@@ -19,7 +19,7 @@ module Ebayr #:nodoc:
       # Remaining options are converted and used as input to the call
       @input = options.delete(:input) || options
     end
-    
+
     def input_xml
       self.class.xml(@input)
     end
@@ -85,13 +85,19 @@ module Ebayr #:nodoc:
     #
     #     Ebayr.xml("Hello!")       # => "Hello!"
     #     Ebayr.xml(:foo=>"Bar")  # => <foo>Bar</foo>
-    #     Ebayr.xml(:foo=>["Bar","Baz"])  # => <foo>Bar</foo>
+    #     Ebayr.xml(:foo=>["Bar","Baz"])  # => <foo>Bar</foo><foo>Baz</foo>
     def self.xml(*args)
       args.map do |structure|
-        case structure
-          when Hash then structure.map { |k, v| "<#{k.to_s}>#{xml(v)}</#{k.to_s}>" }.join
-          when Array then structure.map { |v| xml(v) }.join
-          else self.serialize_input(structure).to_s
+        if Hash === structure
+          structure.map do |k, v|
+            if Array === v
+              v.map { |elem| xml(k => elem) }
+            else
+              "<#{k.to_s}>#{xml(v)}</#{k.to_s}>"
+            end
+          end
+        else
+          self.serialize_input(structure).to_s
         end
       end.join
     end
