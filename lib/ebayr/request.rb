@@ -17,7 +17,11 @@ module Ebayr #:nodoc:
       @compatability_level = (options.delete(:compatability_level) || self.compatability_level).to_s
       @http_timeout = (options.delete(:http_timeout) || 60).to_i
       # Remaining options are converted and used as input to the call
-      @input = self.class.serialize_input(options)
+      @input = options.delete(:input) || options
+    end
+
+    def input_xml
+      self.class.xml(@input)
     end
 
     # Gets the path to which this request will be posted
@@ -46,7 +50,7 @@ module Ebayr #:nodoc:
           <RequesterCredentials>
             <eBayAuthToken>#{@auth_token}</eBayAuthToken>
           </RequesterCredentials>
-          #{self.class.xml(@input)}
+          #{input_xml}
         </#{@command}Request>
       XML
     end
@@ -56,6 +60,9 @@ module Ebayr #:nodoc:
     def send
       http = Net::HTTP.new(@uri.host, @uri.port)
       http.read_timeout = @http_timeout
+
+      # Output request XML if debug flag is set
+      puts body if debug == true
 
       if @uri.port == 443
         http.use_ssl = true
@@ -78,9 +85,10 @@ module Ebayr #:nodoc:
     #
     #     Ebayr.xml("Hello!")       # => "Hello!"
     #     Ebayr.xml(:foo=>"Bar")  # => <foo>Bar</foo>
-    #     Ebayr.xml(:foo=>["Bar","Baz"])  # => <foo>Bar</foo>
+    #     Ebayr.xml(:foo=>["Bar","Baz"])  # => <foo>Bar</foo><foo>Baz</foo>
     def self.xml(*args)
       args.map do |structure|
+=begin
         case structure
           when Hash then
             structure.map do |k, v|
@@ -104,21 +112,28 @@ module Ebayr #:nodoc:
             structure.map { |v| xml(v) }.join
           else
             structure.to_s
+=end
+        if Hash === structure
+          structure.map do |k, v|
+            if Array === v
+              v.map { |elem| xml(k => elem) }
+            else
+              "<#{k.to_s}>#{xml(v)}</#{k.to_s}>"
+            end
+          end
+        else
+          self.serialize_input(structure).to_s
         end
       end.join
     end
 
-    # Prepares a hash of arguments for input to an eBay Trading API XML call.
+    # Prepares an argument for input to an eBay Trading API XML call.
     # * Times are converted to ISO 8601 format
-    def self.serialize_input(args)
-      result = {}
-      args.each do |k, v|
-        result[k] = case v
-          when Time then v.to_time.utc.iso8601
-          else v
-        end
+    def self.serialize_input(input)
+       case input
+         when Time then input.to_time.utc.iso8601
+         else input
       end
-      result
     end
 
     # Converts a command like get_ebay_offical_time to GeteBayOfficialTime
