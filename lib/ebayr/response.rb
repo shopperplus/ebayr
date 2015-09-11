@@ -9,7 +9,17 @@ module Ebayr #:nodoc:
       @body = response.body if @response
       hash = self.class.from_xml(@body) if @body
       response_data = hash["#{@command}Response"] if hash
+      @success = response_data['Ack'] != 'Failure'
+      Ebayr.logger.error response_data if Ebayr.logger && failure?
       super(response_data) if response_data
+    end
+
+    def success?
+      @success
+    end
+
+    def failure?
+      !@success
     end
   end
 end

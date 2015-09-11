@@ -31,6 +31,8 @@ module Ebayr
   # performance).
   mattr_accessor :normalize_responses
 
+  mattr_accessor :logger
+  
   def self.normalize_responses?
     !!normalize_responses
   end
