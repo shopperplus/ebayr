@@ -4,7 +4,7 @@ module Ebayr #:nodoc:
   class Request
     include Ebayr
 
-    attr_reader :command
+    attr_reader :command, :input
 
     # Make a new call. The URI used will be that of Ebayr::uri, unless
     # overridden here (same for auth_token, site_id and compatability_level).
