@@ -36,7 +36,7 @@ module Ebayr #:nodoc:
         errors.select{|x| x[:SeverityCode] == 'Error'}
       else
         [errors]
-      end
+      end.compact
     end
   end
 end
