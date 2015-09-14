@@ -13,7 +13,7 @@ module Ebayr #:nodoc:
       if Ebayr.logger && failure?
         Ebayr.logger.error "#{request.command} at #{Time.now}"
         Ebayr.logger.error request.input
-        Ebayr.logger.error response_data 
+        Ebayr.logger.error errors_info
       end
       super(response_data) if response_data
     end
@@ -24,6 +24,19 @@ module Ebayr #:nodoc:
 
     def failure?
       !@success
+    end
+
+    def errors_info_str
+      errors_info.collect.map{|x| x[:LongMessage]}.join("\n")
+    end
+
+    def errors_info
+      errors = response_data[:Errors]
+      if errors.is_a? Array
+        errors.select{|x| x[:SeverityCode] == 'Error'}
+      else
+        [errors]
+      end
     end
   end
 end
