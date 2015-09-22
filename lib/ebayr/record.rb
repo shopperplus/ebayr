@@ -35,8 +35,8 @@ module Ebayr
     end
 
     def self.convert_key(k)
-      #k.to_s.underscore.gsub(/e_bay/, "ebay").to_sym
-      k.to_s.camelize.gsub(/Ebay/, "eBay").to_sym
+      k.to_s.underscore.gsub(/e_bay/, "ebay").to_sym
+      #k.to_s.camelize.gsub(/Ebay/, "eBay").to_sym
     end
 
     def convert_value(arg)
