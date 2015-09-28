@@ -75,6 +75,7 @@ module Ebayr
   self.compatability_level = 837
 
   mattr_accessor :logger
+  mattr_accessor :exceptions_table
   self.logger = Logger.new(STDOUT)
   self.logger.level = Logger::INFO
 
