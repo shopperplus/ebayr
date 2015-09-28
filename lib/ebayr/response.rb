@@ -17,9 +17,9 @@ module Ebayr #:nodoc:
         Ebayr.logger.error errors_info
       end
       if Ebayr.exceptions_table && failure?
-        Ebayr.exceptions_table.create(content: "#{request.command} at #{Time.now}",
-                                      sent: request.input,
-                                      received: errors_info)
+        Ebayr.exceptions_table.create(content: "Ebayr Call Error: #{request.command}",
+                                      sent: request.input.to_s,
+                                      received: errors_info.to_s)
       end
     end
 
